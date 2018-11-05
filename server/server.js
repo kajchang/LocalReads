@@ -18,25 +18,27 @@ const colName = 'books';
 const client = new MongoClient(url);
 let db, col;
 
-(async ()  => {
-    await client.connect();
-    db = client.db(dbName);
-    col = db.collection(colName);
-})();
+client.connect()
+    .then(() => {
+        console.log('Connected to MongoDB.');
+        db = client.db(dbName);
+        col = db.collection(colName);
+    })
+    .catch(err => {
+        console.log(`Error Connecting to MongoDB: ${err.toString()}`);
+    });
 
 app.post('/create', (req, res) => {
     const title = req.body.title;
     const author = req.body.author;
 
-    if (title === undefined) {
-        res.send({result: 'Missing Parameter: Title'});
-        return;
-    }
+    if (title === undefined) return res.send({
+        result: 'Missing Parameter: Title'
+    });
 
-    if (author === undefined) {
-        res.send({result: 'Missing Parameter: Title'});
-        return;
-    }
+    if (author === undefined) return res.send({
+        result: 'Missing Parameter: Author'
+    });
 
     col.insertOne({
         title: title,
@@ -72,15 +74,13 @@ app.put('/update', (req, res) => {
     const newTitle = req.body.newTitle;
     const newAuthor = req.body.newAuthor;
 
-    if (title && newTitle === undefined || newTitle && title === undefined) {
-        res.send({result: 'Missing Parameter: Title or New Title'});
-        return;
-    }
+    if (title && newTitle === undefined || newTitle && title === undefined) return res.send({
+        result: 'Missing Parameter: Title or New Title'
+    });
 
-    if (author && newAuthor === undefined || newAuthor && author === undefined) {
-        res.send({result: 'Missing Parameter: Author or New Author'});
-        return;
-    }
+    if (author && newAuthor === undefined || newAuthor && author === undefined) return res.send({
+        result: 'Missing Parameter: Author or New Author'
+    });
 
     if (title) {
         col.updateMany({
@@ -125,12 +125,9 @@ app.delete('/delete', (req, res) => {
     const title = req.body.title !== undefined ? req.body.title : { $exists: true };
     const author = req.body.author !== undefined ? req.body.author : { $exists: true };
 
-    if (req.body.author === undefined && req.body.author === undefined) {
-        res.send({
-            result: 'Action prevented because it would delete all documents.'
-        });
-        return;
-    }
+    if (req.body.author === undefined && req.body.author === undefined) return res.send({
+        result: 'Action prevented because it would delete all documents.'
+    });
 
     col.deleteMany({
         title: title,
