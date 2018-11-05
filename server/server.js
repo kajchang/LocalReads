@@ -32,13 +32,19 @@ app.post('/create', (req, res) => {
     const title = req.body.title;
     const author = req.body.author;
 
-    if (title === undefined) return res.send({
-        result: 'Missing Parameter: Title'
-    });
+    if (!title) {
+        res.status(400);
+        return res.send({
+            result: 'Missing Parameter: Title.'
+        });
+    }
 
-    if (author === undefined) return res.send({
-        result: 'Missing Parameter: Author'
-    });
+    if (!author) {
+        res.status(400);
+        return res.send({
+            result: 'Missing Parameter: Author.'
+        });
+    }
 
     col.insertOne({
         title: title,
@@ -46,10 +52,11 @@ app.post('/create', (req, res) => {
     })
         .then(result => {
             res.send({
-                result: `Inserted ${result.insertedCount} Documents`
+                result: `Inserted ${result.insertedCount} Document(s).`
             });
         })
         .catch(err => {
+            res.status(500);
             res.send({
                 result: err.toString()
             });
@@ -57,8 +64,8 @@ app.post('/create', (req, res) => {
 });
 
 app.get('/read', async (req, res) => {
-    const title = req.query.title !== undefined ? req.query.title : { $exists: true };
-    const author = req.query.author !== undefined ? req.query.author : { $exists: true };
+    const title = req.query.title ? req.query.title : { $exists: true };
+    const author = req.query.author ? req.query.author : { $exists: true };
 
     res.send(await col.find({
         title: title,
@@ -74,13 +81,19 @@ app.put('/update', (req, res) => {
     const newTitle = req.body.newTitle;
     const newAuthor = req.body.newAuthor;
 
-    if (title && newTitle === undefined || newTitle && title === undefined) return res.send({
-        result: 'Missing Parameter: Title or New Title'
-    });
+    if (title && !newTitle || newTitle && !title) {
+        res.status(400);
+        return res.send({
+            result: 'Missing Parameter: Title or New Title.'
+        });
+    }
 
-    if (author && newAuthor === undefined || newAuthor && author === undefined) return res.send({
-        result: 'Missing Parameter: Author or New Author'
-    });
+    if (author && !newAuthor || newAuthor && !author) {
+        res.status(400);
+        return res.send({
+            result: 'Missing Parameter: Author or New Author.'
+        });
+    }
 
     if (title) {
         col.updateMany({
@@ -92,10 +105,11 @@ app.put('/update', (req, res) => {
         })
             .then(result => {
                 res.send({
-                    result: `Modified ${result.modifiedCount} Documents`
+                    result: `Modified ${result.modifiedCount} Document(s).`
                 });
             })
             .catch(err => {
+                res.status(500);
                 res.send({
                     result: err.toString()
                 });
@@ -110,10 +124,11 @@ app.put('/update', (req, res) => {
         })
             .then(result => {
                 res.send({
-                    result: `Modified ${result.modifiedCount} Documents`
+                    result: `Modified ${result.modifiedCount} Document(s).`
                 });
             })
             .catch(err => {
+                res.status(500);
                 res.send({
                     result: err.toString()
                 });
@@ -122,12 +137,15 @@ app.put('/update', (req, res) => {
 });
 
 app.delete('/delete', (req, res) => {
-    const title = req.body.title !== undefined ? req.body.title : { $exists: true };
-    const author = req.body.author !== undefined ? req.body.author : { $exists: true };
+    const title = req.body.title ? req.body.title : { $exists: true };
+    const author = req.body.author ? req.body.author : { $exists: true };
 
-    if (req.body.author === undefined && req.body.author === undefined) return res.send({
-        result: 'Action prevented because it would delete all documents.'
-    });
+    if (!req.body.author && !req.body.author) {
+        res.status(400);
+        return res.send({
+            result: 'Action prevented because it would delete all documents.'
+        });
+    }
 
     col.deleteMany({
         title: title,
@@ -135,10 +153,11 @@ app.delete('/delete', (req, res) => {
     })
         .then(result => {
             res.send({
-                result: `Deleted ${result.deletedCount} Documents`
+                result: `Deleted ${result.deletedCount} Document(s).`
             });
         })
         .catch(err => {
+            res.status(500);
             res.send({
                 result: err.toString()
             });
