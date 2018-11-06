@@ -89,7 +89,7 @@ app.put('/update', (req, res) => {
     }
 
     if (newTitle) {
-        col.updateMany({
+        col.updateOne({
             _id: ObjectID(_id)
         }, {
             $set: {
@@ -108,7 +108,7 @@ app.put('/update', (req, res) => {
                 });
             });
     } else if (newAuthor) {
-        col.updateMany({
+        col.updateOne({
             _id: ObjectID(_id)
         }, {
             $set: {

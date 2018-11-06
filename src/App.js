@@ -16,6 +16,7 @@ class App extends Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.create = this.create.bind(this);
+        this.delete = this.delete.bind(this);
 
         this.read();
     }
@@ -61,6 +62,21 @@ class App extends Component {
             });
     }
 
+    delete(event) {
+        axios.delete('/delete', {
+            data : {
+                _id: event.target.id
+            }
+        })
+            .then(response => {
+                console.log(response);
+                this.read();
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
     render() {
         return (
             <Container>
@@ -69,10 +85,8 @@ class App extends Component {
                         <Create handleChange={ this.handleChange } create={ this.create } createMessage={ this.state.createMessage } bookTitle={ this.state.bookTitle } bookAuthor={ this.state.bookAuthor }/>
                     </Col>
                     <Col>
-                        <Read books={ this.state.books }/>
+                        <Read books={ this.state.books } delete={ this.delete }/>
                     </Col>
-                    <Col></Col>
-                    <Col></Col>
                 </Row>
             </Container>
         );
@@ -91,7 +105,7 @@ class Create extends Component {
                     <Label>Book Author</Label>
                     <Input name="bookAuthor" placeholder="Book Author" value={ this.props.bookAuthor } onChange={ this.props.handleChange }/>
                 </FormGroup>
-                <Button onClick={this.props.create}>Create</Button>
+                <Button onClick={ this.props.create }>Create</Button>
                 {this.props.createMessage === '' ? (
                     <div></div>
                 ) : (
@@ -112,12 +126,16 @@ class Read extends Component {
                     <tr>
                         <th>Book Title</th>
                         <th>Book Author</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     { this.props.books.map(book => <tr key={ this.props.books.indexOf(book) }>
                         <td>{ book.title }</td>
                         <td>{ book.author }</td>
+                        <td>
+                            <Button id={ book._id} onClick={ this.props.delete }>Delete</Button>
+                        </td>
                     </tr>) }
                 </tbody>
             </Table>
