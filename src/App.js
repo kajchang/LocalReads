@@ -26,18 +26,13 @@ class App extends Component {
         });
     }
 
-    create() {
-        axios.post('/create', {
+    async create() {
+        await axios.post('/create', {
             title: this.state.bookTitle,
             author: this.state.bookAuthor
-        })
-            .then(response => {
-                console.log(response);
-                this.read();
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        });
+
+        await this.read();
 
         this.setState({
             bookTitle: '',
@@ -45,31 +40,22 @@ class App extends Component {
         });
     }
 
-    read() {
-        axios.get('/read')
-            .then(response => {
-                this.setState({
-                  books: response.data
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            });
+    async read() {
+        const response = await axios.get('/read');
+
+        this.setState({
+            books: response.data
+        });
     }
 
-    delete(event) {
-        axios.delete('/delete', {
+    async delete(event) {
+        await axios.delete('/delete', {
             data : {
                 _id: event.target.id
             }
-        })
-            .then(response => {
-                console.log(response);
-                this.read();
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        });
+
+        await this.read();
     }
 
     render() {
