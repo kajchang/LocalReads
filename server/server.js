@@ -1,5 +1,6 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 const app = express();
 
 const bodyParser = require('body-parser');
@@ -35,14 +36,14 @@ app.post('/create', (req, res) => {
     if (!title) {
         res.status(400);
         return res.send({
-            result: 'Missing Parameter: Title.'
+            result: 'Missing Parameter: title.'
         });
     }
 
     if (!author) {
         res.status(400);
         return res.send({
-            result: 'Missing Parameter: Author.'
+            result: 'Missing Parameter: author.'
         });
     }
 
@@ -75,29 +76,21 @@ app.get('/read', async (req, res) => {
 
 
 app.put('/update', (req, res) => {
-    const title = req.body.title;
-    const author = req.body.author;
+    const _id = req.body._id;
 
     const newTitle = req.body.newTitle;
     const newAuthor = req.body.newAuthor;
 
-    if (title && !newTitle || newTitle && !title) {
+    if (!_id) {
         res.status(400);
         return res.send({
-            result: 'Missing Parameter: Title or New Title.'
+            result: 'Missing Parameter: _id.'
         });
     }
 
-    if (author && !newAuthor || newAuthor && !author) {
-        res.status(400);
-        return res.send({
-            result: 'Missing Parameter: Author or New Author.'
-        });
-    }
-
-    if (title) {
+    if (newTitle) {
         col.updateMany({
-            title: title
+            _id: ObjectID(_id)
         }, {
             $set: {
                 title: newTitle
@@ -114,9 +107,9 @@ app.put('/update', (req, res) => {
                     result: err.toString()
                 });
             });
-    } else if (author) {
+    } else if (newAuthor) {
         col.updateMany({
-            author: author
+            _id: ObjectID(_id)
         }, {
             $set: {
                 author: newAuthor
@@ -133,23 +126,26 @@ app.put('/update', (req, res) => {
                     result: err.toString()
                 });
             });
+    } else {
+        res.status(400);
+        res.send({
+            result: 'Missing Parameter: newTitle or newAuthor.'
+        });
     }
 });
 
 app.delete('/delete', (req, res) => {
-    const title = req.body.title ? req.body.title : { $exists: true };
-    const author = req.body.author ? req.body.author : { $exists: true };
+    const _id = req.body._id;
 
-    if (!req.body.author && !req.body.author) {
+    if (!_id) {
         res.status(400);
         return res.send({
-            result: 'Action prevented because it would delete all documents.'
+            result: 'Missing Parameter: _id.'
         });
     }
 
-    col.deleteMany({
-        title: title,
-        author: author
+    col.deleteOne({
+        _id: ObjectID(_id)
     })
         .then(result => {
             res.send({
