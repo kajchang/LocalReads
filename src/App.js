@@ -16,6 +16,7 @@ class App extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.create = this.create.bind(this);
         this.delete = this.delete.bind(this);
+        this.update = this.update.bind(this);
 
         this.read();
     }
@@ -32,7 +33,7 @@ class App extends Component {
             author: this.state.bookAuthor
         });
 
-        await this.read();
+        this.read();
 
         this.setState({
             bookTitle: '',
@@ -48,6 +49,22 @@ class App extends Component {
         });
     }
 
+    async update(event) {
+        if (event.target.name === 'author') {
+            await axios.put('/update', {
+                _id: event.target.id,
+                newAuthor: event.target.value
+            });
+        } else if (event.target.name === 'title') {
+            await axios.put('/update', {
+                _id: event.target.id,
+                newTitle: event.target.value
+            });
+        }
+
+        this.read();
+    }
+
     async delete(event) {
         await axios.delete('/delete', {
             data : {
@@ -55,7 +72,7 @@ class App extends Component {
             }
         });
 
-        await this.read();
+        this.read();
     }
 
     render() {
@@ -66,7 +83,7 @@ class App extends Component {
                         <Create handleChange={ this.handleChange } create={ this.create } bookTitle={ this.state.bookTitle } bookAuthor={ this.state.bookAuthor }/>
                     </Col>
                     <Col>
-                        <Read books={ this.state.books } delete={ this.delete }/>
+                        <Read books={ this.state.books } delete={ this.delete } update={ this.update }/>
                     </Col>
                 </Row>
             </Container>
@@ -100,13 +117,18 @@ class Read extends Component {
                     <tr>
                         <th>Book Title</th>
                         <th>Book Author</th>
-                        <th></th>
+                        <th/>
+                        <th/>
                     </tr>
                 </thead>
                 <tbody>
                     { this.props.books.map(book => <tr key={ this.props.books.indexOf(book) }>
-                        <td>{ book.title }</td>
-                        <td>{ book.author }</td>
+                        <td>
+                            <Input name='title' id={ book._id } value={ book.title } onChange={ this.props.update }/>
+                        </td>
+                        <td>
+                            <Input name='author' id={ book._id } value={ book.author } onChange={ this.props.update }/>
+                        </td>
                         <td>
                             <Button id={ book._id } onClick={ this.props.delete }>Delete</Button>
                         </td>
