@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Col, Row, Container, Form, FormGroup, Label, Input, Button, Alert, Table } from 'reactstrap';
+import { Col, Row, Container, Form, FormGroup, Label, Input, Button, Table } from 'reactstrap';
 
 import axios from 'axios';
 
@@ -10,7 +10,6 @@ class App extends Component {
         this.state = {
             bookTitle: '',
             bookAuthor: '',
-            createMessage: '',
             books: []
         };
 
@@ -33,15 +32,11 @@ class App extends Component {
             author: this.state.bookAuthor
         })
             .then(response => {
-                this.setState({
-                   createMessage: response.data.result
-                });
+                console.log(response);
                 this.read();
             })
             .catch(err => {
-                this.setState({
-                    createMessage: err.response.data.result
-                });
+                console.log(err);
             });
 
         this.setState({
@@ -82,7 +77,7 @@ class App extends Component {
             <Container>
                 <Row>
                     <Col>
-                        <Create handleChange={ this.handleChange } create={ this.create } createMessage={ this.state.createMessage } bookTitle={ this.state.bookTitle } bookAuthor={ this.state.bookAuthor }/>
+                        <Create handleChange={ this.handleChange } create={ this.create } bookTitle={ this.state.bookTitle } bookAuthor={ this.state.bookAuthor }/>
                     </Col>
                     <Col>
                         <Read books={ this.state.books } delete={ this.delete }/>
@@ -106,13 +101,6 @@ class Create extends Component {
                     <Input name="bookAuthor" placeholder="Book Author" value={ this.props.bookAuthor } onChange={ this.props.handleChange }/>
                 </FormGroup>
                 <Button onClick={ this.props.create }>Create</Button>
-                {this.props.createMessage === '' ? (
-                    <div></div>
-                ) : (
-                    <Alert color="secondary">
-                        { this.props.createMessage }
-                    </Alert>
-                )}
             </Form>
         );
     }
@@ -134,7 +122,7 @@ class Read extends Component {
                         <td>{ book.title }</td>
                         <td>{ book.author }</td>
                         <td>
-                            <Button id={ book._id} onClick={ this.props.delete }>Delete</Button>
+                            <Button id={ book._id } onClick={ this.props.delete }>Delete</Button>
                         </td>
                     </tr>) }
                 </tbody>
