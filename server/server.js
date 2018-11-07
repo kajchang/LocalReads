@@ -88,7 +88,34 @@ app.put('/update', (req, res) => {
         });
     }
 
-    if (newTitle) {
+    if (!newTitle && !newAuthor) {
+        res.status(400);
+        res.send({
+            result: 'Missing Parameter: newTitle or newAuthor.'
+        });
+    }
+
+    if (newTitle && newAuthor) {
+        col.updateOne({
+            _id: ObjectID(_id)
+        }, {
+            $set: {
+                title: newTitle,
+                author: newAuthor
+            }
+        })
+            .then(result => {
+                res.send({
+                    result: `Modified ${result.modifiedCount} Document(s).`
+                });
+            })
+            .catch(err => {
+                res.status(500);
+                res.send({
+                    result: err.toString()
+                });
+            });
+    } else if (newTitle) {
         col.updateOne({
             _id: ObjectID(_id)
         }, {
@@ -126,11 +153,6 @@ app.put('/update', (req, res) => {
                     result: err.toString()
                 });
             });
-    } else {
-        res.status(400);
-        res.send({
-            result: 'Missing Parameter: newTitle or newAuthor.'
-        });
     }
 });
 

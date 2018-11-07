@@ -14,6 +14,7 @@ class App extends Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleBookChange = this.handleBookChange.bind(this);
         this.create = this.create.bind(this);
         this.delete = this.delete.bind(this);
         this.update = this.update.bind(this);
@@ -24,6 +25,16 @@ class App extends Component {
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value
+        });
+    }
+
+    handleBookChange(event) {
+        const updatedBooks = this.state.books;
+
+        updatedBooks[updatedBooks.findIndex(book => book._id === event.target.id)][event.target.name] = event.target.value;
+
+        this.setState({
+            books: updatedBooks
         });
     }
 
@@ -50,17 +61,11 @@ class App extends Component {
     }
 
     async update(event) {
-        if (event.target.name === 'author') {
-            await axios.put('/update', {
-                _id: event.target.id,
-                newAuthor: event.target.value
-            });
-        } else if (event.target.name === 'title') {
-            await axios.put('/update', {
-                _id: event.target.id,
-                newTitle: event.target.value
-            });
-        }
+        await axios.put('/update', {
+            _id: event.target.id,
+            newAuthor: this.state.books[this.state.books.findIndex(book => book._id === event.target.id)].author,
+            newTitle: this.state.books[this.state.books.findIndex(book => book._id === event.target.id)].title
+        });
 
         this.read();
     }
@@ -83,7 +88,7 @@ class App extends Component {
                         <Create handleChange={ this.handleChange } create={ this.create } bookTitle={ this.state.bookTitle } bookAuthor={ this.state.bookAuthor }/>
                     </Col>
                     <Col>
-                        <Read books={ this.state.books } delete={ this.delete } update={ this.update }/>
+                        <Read books={ this.state.books } delete={ this.delete } update={ this.update } handleBookChange={ this.handleBookChange }/>
                     </Col>
                 </Row>
             </Container>
@@ -124,13 +129,16 @@ class Read extends Component {
                 <tbody>
                     { this.props.books.map(book => <tr key={ this.props.books.indexOf(book) }>
                         <td>
-                            <Input name='title' id={ book._id } value={ book.title } onChange={ this.props.update }/>
+                            <Input name='title' id={ book._id } value={ book.title } onChange={ this.props.handleBookChange }/>
                         </td>
                         <td>
-                            <Input name='author' id={ book._id } value={ book.author } onChange={ this.props.update }/>
+                            <Input name='author' id={ book._id } value={ book.author } onChange={ this.props.handleBookChange }/>
                         </td>
                         <td>
                             <Button id={ book._id } onClick={ this.props.delete }>Delete</Button>
+                        </td>
+                        <td>
+                            <Button id={ book._id } onClick={ this.props.update }>Update</Button>
                         </td>
                     </tr>) }
                 </tbody>
