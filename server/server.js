@@ -90,7 +90,7 @@ app.put('/update', (req, res) => {
 
     if (!newTitle && !newAuthor) {
         res.status(400);
-        res.send({
+        return res.send({
             result: 'Missing Parameter: newTitle or newAuthor.'
         });
     }
