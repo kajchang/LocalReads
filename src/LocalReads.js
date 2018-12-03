@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import { Col, Row, Container, Form, FormGroup, Label, Input, Button, Table } from 'reactstrap';
+import { Col, Row, Container, Form, FormGroup, Label, Input, Button, Table, Navbar, NavbarBrand } from 'reactstrap';
 
 import axios from 'axios';
 
-class App extends Component {
+class LocalReads extends Component {
     constructor(props) {
         super(props);
 
@@ -83,6 +83,9 @@ class App extends Component {
     render() {
         return (
             <Container>
+                <Navbar color="light" light expand="md">
+                    <NavbarBrand>LocalReads</NavbarBrand>
+                </Navbar>
                 <Row>
                     <Col>
                         <Create handleChange={ this.handleChange } create={ this.create } bookTitle={ this.state.bookTitle } bookAuthor={ this.state.bookAuthor }/>
@@ -147,4 +150,4 @@ class Read extends Component {
     }
 }
 
-export default App;
+export default LocalReads;

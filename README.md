@@ -14,7 +14,7 @@ Install node dependencies:
 yarn
 ```
 
-# Run
+## Run
 
 It currently only works in development mode, but I'll make a few minor changes in the future for it to be able to server the built files in a production environment.
 
